@@ -1,8 +1,4 @@
-from letters import read_letters, letter_pool
-from words import read_words
+from game import game
 
-letters = read_letters('french')
-words = read_words('french')
-
-print(letters)
-print(letter_pool(letters))
+if __name__ == '__main__':
+    game()
