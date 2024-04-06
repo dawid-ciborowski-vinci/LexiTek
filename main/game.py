@@ -1,6 +1,8 @@
+from words import read_words, validate_word
 from letters import read_letters, player_letters, letter_pool
 
 languages = ['french', 'english']
+
 ui = {
     'french': {
         'player_number': "Nombre de joueurs:\t"
@@ -9,7 +11,38 @@ ui = {
         'player_number': "Number of players:\t"
     }
 }
+
 MAX_PLAYERS = 4
+
+board = [[None for _ in range(15)] for _ in range(15)]
+
+dictionary = {}
+
+
+def place_word(word, direction, position):
+    x, y = position
+
+    if not (0 <= x < 15 and 0 <= y < 15):
+        return False
+
+    if direction == 'horizontal':
+        if x + len(word) > 15:
+            return False
+        for i in range(len(word)):
+            if board[x + i][y] is not None:
+                return False
+            board[x + i][y] = word[i]
+    elif direction == 'vertical':
+        if y + len(word) > 15:
+            return False
+        for i in range(len(word)):
+            if board[x][y + i] is not None:
+                return False
+            board[x][y + i] = word[i]
+    else:
+        return False
+
+    return True
 
 
 # Function to run the LexiTek game
@@ -32,6 +65,9 @@ def game():
     all_letters = read_letters(language)
     letters = letter_pool(all_letters)
 
+    # Init Dictionary
+    dictionary = read_words(language)
+
     # Init Players and turn
     players = {}
     for i in range(players_number):
@@ -42,17 +78,25 @@ def game():
     print(language)
     print(players)
 
-
-"""
+    # Game loop
     running = True
     while running:
-        index = tour % len(joueurs)
-        joueur = joueurs[index]
+        index = turn % len(players)
+        player = players[index]
         print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-        print(f"Tour du joueur n°{joueur + 1}\nVoici vos cartes:\n")
-        # cartes.afficher_cartes(distribution[joueur])
+        print(f"Tour du player n°{player + 1}\nVoici vos lettres:\n")
+        print(players[index])
 
-        # ETAPE 1: PIOCHER CARTE
+        # STEP 1: PLAYER PLAY A WORD
+        word = ""
+
+        while not validate_word(word, players[index], dictionary):
+            word = input("Entrez le mot à jouer:\t")
+
+        direction = input("Entrez la direction (horizontal/vertical):\t")
+
+
+"""    
         choix = ''
         while not choix in ['a', 'b']:
             choix = 'a'
@@ -78,7 +122,7 @@ def game():
 
         if carte_tiree is not None:
             print(f"Vous tirez la carte:\t{cartes.donner_valeur(carte_tiree[0])} | {carte_tiree[1]}")
-            distribution[joueur].append(carte_tiree)
+            distribution[player].append(carte_tiree)
 
         # ETAPE 2: DEPOSER COMBINAISON OU PAS
         choix = ''
@@ -86,7 +130,7 @@ def game():
 
         while cartes_non_valide or not choix in ['a', 'b', 'c']:
             print()
-            cartes.afficher_cartes(distribution[joueur])
+            cartes.afficher_cartes(distribution[player])
             print("\na) Déposer une combinaison")
             print("b) Ne rien déposer")
 
@@ -101,22 +145,22 @@ def game():
             print()
 
             if choix == 'a':
-                cartes_a_deposer = actions.choix_deposer(distribution[joueur])
+                cartes_a_deposer = actions.choix_deposer(distribution[player])
                 if combinaison.valide(cartes_a_deposer):
                     print("Votre combinaison est valide !")
                     plateau.append(cartes_a_deposer)
                     cartes_non_valide = False
                 else:
                     print("Votre combinaison n'est pas valide !")
-                    distribution[joueur].extend(cartes_a_deposer)
+                    distribution[player].extend(cartes_a_deposer)
 
             elif choix == 'c':
                 choix_combinaison = -1
                 while not (0 < choix_combinaison <= len(plateau)):
                     choix_combinaison = int(input("Choisissez le numéro de combinaison à compléter:\t"))
 
-                etat_initial = distribution[joueur].copy()
-                cartes_pour_completer = actions.choix_deposer(distribution[joueur])
+                etat_initial = distribution[player].copy()
+                cartes_pour_completer = actions.choix_deposer(distribution[player])
                 if len(cartes_pour_completer) != 0:
                     cartes_completees = cartes_pour_completer
                     cartes_completees.extend(plateau[choix_combinaison - 1])
@@ -127,7 +171,7 @@ def game():
                         cartes_non_valide = False
                     else:
                         print("Votre combinaison n'est pas valide !")
-                        distribution[joueur] = etat_initial
+                        distribution[player] = etat_initial
                 else:
                     print("Aucune carte chosie.")
 
@@ -137,18 +181,17 @@ def game():
         print()
 
         # ETAPE 3: DEFAUSSER UNE CARTE
-        if len(distribution[joueur]) != 0:
-            cartes.afficher_cartes(distribution[joueur])
-            defausse.append(actions.defausser(distribution[joueur]))
-            tour += 1
-        if len(distribution[joueur]) == 0:
+        if len(distribution[player]) != 0:
+            cartes.afficher_cartes(distribution[player])
+            defausse.append(actions.defausser(distribution[player]))
+            turn += 1
+        if len(distribution[player]) == 0:
             running = False
-            joueurs.remove(joueur)
-            print(f"\nJoueur n°{joueur + 1} a gagné !")
+            players.remove(player)
+            print(f"\nJoueur n°{player + 1} a gagné !")
 
-    # Affichage des points pour les joueurs restants
-    for joueur in joueurs:
-        total_points = cartes.compter_points(distribution[joueur])
-        print(f"\nPoints du joueur n°{joueur + 1}: {total_points} pts")
-        
+    # Affichage des points pour les players restants
+    for player in players:
+        total_points = cartes.compter_points(distribution[player])
+        print(f"\nPoints du player n°{player + 1}: {total_points} pts")
 """

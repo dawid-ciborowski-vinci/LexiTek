@@ -37,3 +37,4 @@ def player_letters(available_letters):
         letters.append(letter)
         available_letters.pop(random_i)
     return letters
+
