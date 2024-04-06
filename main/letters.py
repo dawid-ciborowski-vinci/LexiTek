@@ -35,5 +35,5 @@ def player_letters(available_letters):
         random_i = random.randint(0, len(available_letters) - 1)
         letter = available_letters[random_i]
         letters.append(letter)
-        available_letters.remove(random_i)
+        available_letters.pop(random_i)
     return letters

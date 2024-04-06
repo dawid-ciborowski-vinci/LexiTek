@@ -1,4 +1,4 @@
-from letters import read_letters, player_letters
+from letters import read_letters, player_letters, letter_pool
 
 languages = ['french', 'english']
 ui = {
@@ -29,7 +29,8 @@ def game():
     players_number = int(players_number)
 
     # Init Letters
-    letters = read_letters(language)
+    all_letters = read_letters(language)
+    letters = letter_pool(all_letters)
 
     # Init Players and turn
     players = {}
