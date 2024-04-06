@@ -5,10 +5,36 @@ languages = ['french', 'english']
 
 ui = {
     'french': {
-        'player_number': "Nombre de joueurs:\t"
+        'player_number': "Nombre de joueurs:\t",
+        'choice': "Mon choix:\t",
+        'choose_action': {'q': 'À votre tour ! Que voulez-vous faire ?',
+                          'a': 'a)\tPlacer un mot',
+                          'b': 'b)\tÉchanger lettre(s)',
+                          'c': 'c)\tPasser son tour'},
+        'enter_word': "Mot à placer:\t",
+        'enter_position': {
+            'q': "Position du mot:\t",
+            'a': "a)\tHorizontale",
+            'b': "b)\tVerticale",
+        },
+        'enter_x': "Colonne de la première lettre:\t",
+        'enter_y': "Ligne de la première lettre:\t",
     },
     'english': {
-        'player_number': "Number of players:\t"
+        'player_number': "Number of players:\t",
+        'choice': "My choice:\t",
+        'choose_action': {'q': 'It\'s your turn ! What is your action ?',
+                          'a': 'a)\tPlace a word',
+                          'b': 'b)\tChange letter(s)',
+                          'c': 'c)\tPass'},
+        'enter_word': "Word to place:\t",
+        'enter_position': {
+            'q': "Word Position:\t",
+            'a': "a)\tHorizontal",
+            'b': "b)\tVertical",
+        },
+        'enter_x': "Column of the first letter:\t",
+        'enter_y': "Line of the first letter:\t",
     }
 }
 
@@ -88,12 +114,35 @@ def game():
         print(players[index])
 
         # STEP 1: PLAYER PLAY A WORD
+        choice1 = ''
         word = ""
+        x, y = '', ''
+        direction = ""
+        changed_all_letters = False
+        while not choice1 in ['a', 'b']:
+            print(ui[language]['choose_action']['q'])
+            print(ui[language]['choose_action']['a'])
+            print(ui[language]['choose_action']['b'])
+            if changed_all_letters:
+                print(ui[language]['choose_action']['c'])
+            choice1 = input(ui[language]['choice'])
 
-        while not validate_word(word, players[index], dictionary):
-            word = input("Entrez le mot à jouer:\t")
-
-        direction = input("Entrez la direction (horizontal/vertical):\t")
+        if choice1 == 'a':
+            while not validate_word(word, player, dictionary):
+                word = input(ui[language]['enter_word'])
+            while not direction in ["horizontal", "vertical"]:
+                print(ui[language]['enter_direction']['q'])
+                print(ui[language]['enter_direction']['a'])
+                print(ui[language]['enter_direction']['b'])
+                direction = input(ui[language]['choice'])
+            # TODO - Vérifier si au premier tour, au moins une des lettres est au centre.
+            while not x.isnumeric():
+                x = input(ui[language]['enter_x'])
+            while not y.isnumeric():
+                y = input(ui[language]['enter_y'])
+            x = int(x)
+            y = int(y)
+            place_word(word, direction, (x, y))
 
 
 """    
