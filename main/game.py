@@ -45,25 +45,51 @@ LETTERS_PER_PLAYER = 7
 dictionary = {}
 
 
-def place_word(board, word, direction, x, y):
+def place_word(board, word, direction, x, y, player_letters):
     if not (0 <= x < BOARD_SIZE and 0 <= y < BOARD_SIZE):
         return False
 
+    if not is_word_placeable(board, word, direction, x, y):
+        return False
+
+    if direction == 'horizontal':
+        for i in range(len(word)):
+            letter = word[i]
+            board[y][x + i] = letter
+            player_letters.remove(letter)
+    elif direction == 'vertical':
+        for i in range(len(word)):
+            letter = word[i]
+            board[y + 1][x] = letter
+            player_letters.remove(letter)
+
+    return True
+
+
+def is_word_placeable(board, word, direction, x, y):
     if direction == 'horizontal':
         if x + len(word) > BOARD_SIZE:
             return False
         for i in range(len(word)):
-            if board[x + i][y] != '':
+            if board[x + 1][y] != '':
                 return False
-            board[x + i][y] = word[i]
     elif direction == 'vertical':
         if y + len(word) > BOARD_SIZE:
             return False
         for i in range(len(word)):
             if board[x][y + i] != '':
                 return False
-            board[x][y + i] = word[i]
     return True
+
+
+def is_centered(word, direction, x, y):
+    if direction == 'horizontal':
+        if (x <= 7 < x + len(word)) and (y == 7 or (y < 7 and y + 1 < 7) or (y > 7 and y - 1 >= 7)):
+            return True
+    elif direction == 'vertical':
+        if (y <= 7 < y + len(word)) and (x == 7 or (x < 7 and x + 1 < 7) or (x > 7 and x - 1 >= 7)):
+            return True
+    return False
 
 
 # Function to run the LexiTek game
@@ -118,7 +144,7 @@ def game():
 
         print()
 
-        # STEP 1: PLAYER PLAY A WORD
+        # STEP 1: PLAYER MAKE ACTION
         choice1 = ''
         word = ""
         x, y = '', ''
@@ -133,27 +159,42 @@ def game():
                 print(ui[language]['choose_action']['c'])
             choice1 = input(ui[language]['choice'])
 
+        # PLAYER PLACES A WORD
         if choice1 == 'a':
             while not is_word_valid(word, player_letters_pool, dictionary):
-                word = input(ui[language]['enter_word'])
+                word = input(ui[language]['enter_word']).upper()
+
             while direction not in ['a', 'b']:
                 print(ui[language]['enter_direction']['q'])
                 print(ui[language]['enter_direction']['a'])
                 print(ui[language]['enter_direction']['b'])
                 direction = input(ui[language]['choice'])
-            # TODO - Vérifier si au premier tour, au moins une des lettres est au centre.
-            while not x.isnumeric():
+
+            while True:
                 x = input(ui[language]['enter_x'])
-            while not y.isnumeric():
                 y = input(ui[language]['enter_y'])
-            x = int(x)
-            y = int(y)
+                if not x.isnumeric():
+                    print("La colonne doit être un nombre.")
+                if not y.isnumeric():
+                    print("La ligne doit être un nombre.")
+                else:
+                    x = int(x)
+                    y = int(y)
+                    if turn == 1 and not is_centered(word, direction, x, y):
+                        print("Le mot doit passer par la case centrale (7, 7) lors du premier tour.")
+                    else:
+                        break
+
             if direction == 'a':
                 direction = 'horizontal'
             elif direction == 'b':
                 direction = 'vertical'
-            res = place_word(board, word, direction, x, y)
+
+            res = place_word(board, word, direction, x, y, player_letters_pool)
             print(res)
+
+        # PLAYER CHANGES A LETTER
+        #elif choice1 == 'b':
         turn += 1
 
 
