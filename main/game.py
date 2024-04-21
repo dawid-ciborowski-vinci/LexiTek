@@ -1,18 +1,18 @@
-from words import read_words, validate_word
-from letters import read_letters, player_letters, letter_pool
+from words import read_words, is_word_valid
+from letters import read_letters, player_letters, letter_pool, get_value
 
 languages = ['french', 'english']
 
 ui = {
     'french': {
         'player_number': "Nombre de joueurs:\t",
-        'choice': "Mon choix:\t",
-        'choose_action': {'q': 'À votre tour ! Que voulez-vous faire ?',
+        'choice': "\nMon choix:\t",
+        'choose_action': {'q': 'Que voulez-vous faire ?',
                           'a': 'a)\tPlacer un mot',
                           'b': 'b)\tÉchanger lettre(s)',
                           'c': 'c)\tPasser son tour'},
         'enter_word': "Mot à placer:\t",
-        'enter_position': {
+        'enter_direction': {
             'q': "Position du mot:\t",
             'a': "a)\tHorizontale",
             'b': "b)\tVerticale",
@@ -22,13 +22,13 @@ ui = {
     },
     'english': {
         'player_number': "Number of players:\t",
-        'choice': "My choice:\t",
-        'choose_action': {'q': 'It\'s your turn ! What is your action ?',
+        'choice': "\nMy choice:\t",
+        'choose_action': {'q': 'What is your action ?',
                           'a': 'a)\tPlace a word',
                           'b': 'b)\tChange letter(s)',
                           'c': 'c)\tPass'},
         'enter_word': "Word to place:\t",
-        'enter_position': {
+        'enter_direction': {
             'q': "Word Position:\t",
             'a': "a)\tHorizontal",
             'b': "b)\tVertical",
@@ -38,16 +38,14 @@ ui = {
     }
 }
 
+BOARD_SIZE = 15
 MAX_PLAYERS = 4
-
-board = [[None for _ in range(15)] for _ in range(15)]
+LETTERS_PER_PLAYER = 7
 
 dictionary = {}
 
 
-def place_word(word, direction, position):
-    x, y = position
-
+def place_word(board, word, direction, x, y):
     if not (0 <= x < 15 and 0 <= y < 15):
         return False
 
@@ -55,25 +53,26 @@ def place_word(word, direction, position):
         if x + len(word) > 15:
             return False
         for i in range(len(word)):
-            if board[x + i][y] is not None:
+            if board[x + i][y] != '':
                 return False
             board[x + i][y] = word[i]
     elif direction == 'vertical':
         if y + len(word) > 15:
             return False
         for i in range(len(word)):
-            if board[x][y + i] is not None:
+            if board[x][y + i] != '':
                 return False
             board[x][y + i] = word[i]
-    else:
-        return False
-
     return True
 
 
 # Function to run the LexiTek game
 def game():
     # Language
+    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+    print("\t\t\t\t\t\t\tLexiTek")
+    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
+
     language_choice = -1
     while not str(language_choice).isnumeric() or int(language_choice) - 1 not in range(len(languages)):
         for i, language in enumerate(languages):
@@ -88,30 +87,36 @@ def game():
     players_number = int(players_number)
 
     # Init Letters
-    all_letters = read_letters(language)
-    letters = letter_pool(all_letters)
+    read_letters(language)
+    letters = letter_pool()
 
     # Init Dictionary
     dictionary = read_words(language)
 
+    # Init Board
+    board = [['' for _ in range(BOARD_SIZE)] for _ in range(BOARD_SIZE)]
+
     # Init Players and turn
     players = {}
     for i in range(players_number):
-        my_letters = player_letters(letters)
+        my_letters = player_letters(letters, LETTERS_PER_PLAYER)
         players[i] = my_letters
     turn = 0
-
-    print(language)
-    print(players)
 
     # Game loop
     running = True
     while running:
-        index = turn % len(players)
-        player = players[index]
-        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-        print(f"Tour du player n°{player + 1}\nVoici vos lettres:\n")
-        print(players[index])
+        player_number = turn % len(players)
+        player_letters_pool = players[player_number]
+
+        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
+        print(f"\t\t\t\t\tTour du joueur n°{player_number + 1}\n")
+        display_board(board)
+
+        print("\nVoici vos lettres : \n")
+        display_player_pool(player_letters_pool)
+
+        print()
 
         # STEP 1: PLAYER PLAY A WORD
         choice1 = ''
@@ -119,7 +124,8 @@ def game():
         x, y = '', ''
         direction = ""
         changed_all_letters = False
-        while not choice1 in ['a', 'b']:
+
+        while choice1 not in ['a', 'b']:
             print(ui[language]['choose_action']['q'])
             print(ui[language]['choose_action']['a'])
             print(ui[language]['choose_action']['b'])
@@ -128,9 +134,9 @@ def game():
             choice1 = input(ui[language]['choice'])
 
         if choice1 == 'a':
-            while not validate_word(word, player, dictionary):
+            while not is_word_valid(word, player_letters_pool, dictionary):
                 word = input(ui[language]['enter_word'])
-            while not direction in ["horizontal", "vertical"]:
+            while direction not in ['a', 'b']:
                 print(ui[language]['enter_direction']['q'])
                 print(ui[language]['enter_direction']['a'])
                 print(ui[language]['enter_direction']['b'])
@@ -142,7 +148,34 @@ def game():
                 y = input(ui[language]['enter_y'])
             x = int(x)
             y = int(y)
-            place_word(word, direction, (x, y))
+            if direction == 'a':
+                direction = 'horizontal'
+            elif direction == 'b':
+                direction = 'vertical'
+            res = place_word(board, word, direction, x, y)
+            print(res)
+        turn += 1
+
+
+def display_player_pool(pool):
+    for letter in pool:
+        print(f"{letter.capitalize()}", end="\t")
+    print()
+    for letter in pool:
+        print(f"{get_value(letter)}", end="\t")
+    print()
+
+
+def display_board(board):
+    print('\t', end='')
+    for i in range(len(board[0])):
+        print(f'{i}\t', end='')
+    print()
+    for i, row in enumerate(board):
+        print(f'{i}\t', end='')
+        for cell in row:
+            print(cell if cell else '.', end='\t')
+        print()
 
 
 """    

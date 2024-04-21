@@ -10,17 +10,14 @@ def read_words(language):
     return words_map
 
 
-def validate_word(word, player_letters, dictionary):
-
+def is_word_valid(word, player_letters, dictionary):
     # Check if the word is in the dictionary
-    if word not in dictionary:
+    player_word = word.upper()
+    if player_word not in dictionary:
         return False
 
     # Check if the word can be formed with the player's letters
-    for letter in word:
+    for letter in player_word:
         if letter not in player_letters:
             return False
-        else:
-            player_letters.remove(letter)
-
     return True
