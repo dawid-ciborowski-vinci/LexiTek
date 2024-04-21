@@ -46,18 +46,18 @@ dictionary = {}
 
 
 def place_word(board, word, direction, x, y):
-    if not (0 <= x < 15 and 0 <= y < 15):
+    if not (0 <= x < BOARD_SIZE and 0 <= y < BOARD_SIZE):
         return False
 
     if direction == 'horizontal':
-        if x + len(word) > 15:
+        if x + len(word) > BOARD_SIZE:
             return False
         for i in range(len(word)):
             if board[x + i][y] != '':
                 return False
             board[x + i][y] = word[i]
     elif direction == 'vertical':
-        if y + len(word) > 15:
+        if y + len(word) > BOARD_SIZE:
             return False
         for i in range(len(word)):
             if board[x][y + i] != '':

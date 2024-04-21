@@ -19,7 +19,11 @@ def read_letters(language):
 
 # Make the letter pool
 def letter_pool():
-    return list(letters_map)
+    pool = []
+    for letter in letters_map.keys():
+        for _ in range(letters_map[letter]['f']):
+            pool.append(letter)
+    return pool
 
 
 def get_value(letter):
