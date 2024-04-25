@@ -1,5 +1,5 @@
 from words import read_words, is_word_valid
-from letters import read_letters, player_letters, letter_pool, get_value
+from letters import read_letters, player_letters, letter_pool, get_value, pop_one
 
 languages = ['french', 'english']
 
@@ -19,6 +19,7 @@ ui = {
         },
         'enter_x': "Colonne de la première lettre:\t",
         'enter_y': "Ligne de la première lettre:\t",
+        'enter_letter': "Lettre:\t",
     },
     'english': {
         'player_number': "Number of players:\t",
@@ -35,6 +36,7 @@ ui = {
         },
         'enter_x': "Column of the first letter:\t",
         'enter_y': "Line of the first letter:\t",
+        'enter_letter': "Letter:\t",
     }
 }
 
@@ -45,7 +47,7 @@ LETTERS_PER_PLAYER = 7
 dictionary = {}
 
 
-def place_word(board, word, direction, x, y, player_letters):
+def place_word(board, word, direction, x, y, player_letters, letters):
     if not (0 <= x < BOARD_SIZE and 0 <= y < BOARD_SIZE):
         return False
 
@@ -57,11 +59,17 @@ def place_word(board, word, direction, x, y, player_letters):
             letter = word[i]
             board[y][x + i] = letter
             player_letters.remove(letter)
+            letter = pop_one(letters)
+            if letter is not None:
+                player_letters.append(letter)
     elif direction == 'vertical':
         for i in range(len(word)):
             letter = word[i]
             board[y + 1][x] = letter
             player_letters.remove(letter)
+            letter = pop_one(letters)
+            if letter is not None:
+                player_letters.append(letter)
 
     return True
 
@@ -84,10 +92,10 @@ def is_word_placeable(board, word, direction, x, y):
 
 def is_centered(word, direction, x, y):
     if direction == 'horizontal':
-        if (x <= 7 < x + len(word)) and (y == 7 or (y < 7 and y + 1 < 7) or (y > 7 and y - 1 >= 7)):
+        if (x <= 7 < x + len(word)) and (y == 7):
             return True
     elif direction == 'vertical':
-        if (y <= 7 < y + len(word)) and (x == 7 or (x < 7 and x + 1 < 7) or (x > 7 and x - 1 >= 7)):
+        if (y <= 7 < y + len(word)) and (x == 7):
             return True
     return False
 
@@ -170,6 +178,11 @@ def game():
                 print(ui[language]['enter_direction']['b'])
                 direction = input(ui[language]['choice'])
 
+            if direction == 'a':
+                direction = 'horizontal'
+            elif direction == 'b':
+                direction = 'vertical'
+
             while True:
                 x = input(ui[language]['enter_x'])
                 y = input(ui[language]['enter_y'])
@@ -180,21 +193,25 @@ def game():
                 else:
                     x = int(x)
                     y = int(y)
-                    if turn == 1 and not is_centered(word, direction, x, y):
+                    if turn == 0 and not is_centered(word, direction, x, y):
                         print("Le mot doit passer par la case centrale (7, 7) lors du premier tour.")
                     else:
                         break
 
-            if direction == 'a':
-                direction = 'horizontal'
-            elif direction == 'b':
-                direction = 'vertical'
-
-            res = place_word(board, word, direction, x, y, player_letters_pool)
+            res = place_word(board, word, direction, x, y, player_letters_pool, letters)
             print(res)
 
         # PLAYER CHANGES A LETTER
-        #elif choice1 == 'b':
+        elif choice1 == 'b':
+            letter_choice = ''
+            while letter_choice not in player_letters_pool:
+                letter_choice = input(ui[language]['enter_letter']).upper()
+            removed_letter = player_letters_pool.remove(letter_choice)
+            letter_to_add = pop_one(letters)
+            if letter_to_add is not None:
+                letters.append(removed_letter)
+                player_letters_pool.append(letter_to_add)
+
         turn += 1
 
 
@@ -217,104 +234,3 @@ def display_board(board):
         for cell in row:
             print(cell if cell else '.', end='\t')
         print()
-
-
-"""    
-        choix = ''
-        while not choix in ['a', 'b']:
-            choix = 'a'
-            if len(defausse) != 0:
-                carte_defausse = defausse[len(defausse) - 1]
-                print(f"\nDéfausse:\t{cartes.donner_valeur(carte_defausse[0])} | {carte_defausse[1]}\n")
-                print("a) Piocher")
-                print("b) Tirer de la défausse")
-                choix = input("\nVotre choix:\t")
-
-        print()
-
-        carte_tiree = None
-        if choix == 'a':
-            print("Vous tirez dans la pioche.")
-            carte_tiree = cartes.tirer_carte(pioche)
-            if carte_tiree is None:
-                choix = 'b'
-
-        if choix == 'b':
-            print("Vous tirez dans la défausse.")
-            carte_tiree = cartes.tirer_carte(defausse)
-
-        if carte_tiree is not None:
-            print(f"Vous tirez la carte:\t{cartes.donner_valeur(carte_tiree[0])} | {carte_tiree[1]}")
-            distribution[player].append(carte_tiree)
-
-        # ETAPE 2: DEPOSER COMBINAISON OU PAS
-        choix = ''
-        cartes_non_valide = True
-
-        while cartes_non_valide or not choix in ['a', 'b', 'c']:
-            print()
-            cartes.afficher_cartes(distribution[player])
-            print("\na) Déposer une combinaison")
-            print("b) Ne rien déposer")
-
-            if len(plateau) != 0:
-                print("c) Compléter une combinaison existante\nVoici les combinaisons déjà déposées:\n")
-                for i, combi in enumerate(plateau):
-                    print(f"Combinaison n°{i + 1}:\n")
-                    cartes.afficher_cartes(combi)
-                    print()
-            choix = input("\nVotre choix:\t")
-
-            print()
-
-            if choix == 'a':
-                cartes_a_deposer = actions.choix_deposer(distribution[player])
-                if combinaison.valide(cartes_a_deposer):
-                    print("Votre combinaison est valide !")
-                    plateau.append(cartes_a_deposer)
-                    cartes_non_valide = False
-                else:
-                    print("Votre combinaison n'est pas valide !")
-                    distribution[player].extend(cartes_a_deposer)
-
-            elif choix == 'c':
-                choix_combinaison = -1
-                while not (0 < choix_combinaison <= len(plateau)):
-                    choix_combinaison = int(input("Choisissez le numéro de combinaison à compléter:\t"))
-
-                etat_initial = distribution[player].copy()
-                cartes_pour_completer = actions.choix_deposer(distribution[player])
-                if len(cartes_pour_completer) != 0:
-                    cartes_completees = cartes_pour_completer
-                    cartes_completees.extend(plateau[choix_combinaison - 1])
-
-                    if combinaison.valide(cartes_completees):
-                        print("Votre combinaison est valide !")
-                        plateau[choix_combinaison - 1] = cartes_completees
-                        cartes_non_valide = False
-                    else:
-                        print("Votre combinaison n'est pas valide !")
-                        distribution[player] = etat_initial
-                else:
-                    print("Aucune carte chosie.")
-
-            elif choix == 'b':
-                cartes_non_valide = False
-
-        print()
-
-        # ETAPE 3: DEFAUSSER UNE CARTE
-        if len(distribution[player]) != 0:
-            cartes.afficher_cartes(distribution[player])
-            defausse.append(actions.defausser(distribution[player]))
-            turn += 1
-        if len(distribution[player]) == 0:
-            running = False
-            players.remove(player)
-            print(f"\nJoueur n°{player + 1} a gagné !")
-
-    # Affichage des points pour les players restants
-    for player in players:
-        total_points = cartes.compter_points(distribution[player])
-        print(f"\nPoints du player n°{player + 1}: {total_points} pts")
-"""

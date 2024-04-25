@@ -37,3 +37,11 @@ def player_letters(available_letters, number_of_letters):
         letter = available_letters.pop(random_i)
         letters.append(letter)
     return letters
+
+
+def pop_one(available_letters):
+    letter = None
+    if len(available_letters) != 0:
+        random_i = random.randint(0, len(available_letters) - 1)
+        letter = available_letters.pop(random_i)
+    return letter
