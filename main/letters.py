@@ -1,8 +1,7 @@
 import random
-from random import shuffle
+
 
 letters_map = {}
-
 
 # Read letters with its frequency and value from file
 def read_letters():
@@ -15,6 +14,9 @@ def read_letters():
 
             # f = frequency, v = value
             letters_map[letter] = {'f': frequency, 'v': value}
+
+
+read_letters()
 
 
 # Make the letter pool
