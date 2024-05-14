@@ -1,26 +1,26 @@
 from prettytable import PrettyTable
 
-from LexiTek.main.language_map import ui
-from LexiTek.main.letters import get_value, pop_one
+from language import ui, get_language
+from letters import get_value, pop_one
 
 
 BOARD_SIZE = 15
 
 
-def place_word(board, word, direction, x, y, player_letters, letters, language):
+def place_word(board, word, direction, x, y, player_letters, letters):
     if not (0 <= x < BOARD_SIZE and 0 <= y < BOARD_SIZE):
-        return ui[language]['error_1']
+        return ui[get_language()]['error_1']
 
     if direction == 'horizontal' and x + len(word) > BOARD_SIZE:
-        return ui[language]['error_2']
+        return ui[get_language()]['error_2']
     elif direction == 'vertical' and y + len(word) > BOARD_SIZE:
-        return ui[language]['error_3']
+        return ui[get_language()]['error_3']
 
     if not is_word_placeable(board, word, direction, x, y):
-        return ui[language]['error_4']
+        return ui[get_language()]['error_4']
 
     if not is_word_compatible(board, word, direction, x, y):
-        return ui[language]['error_5']
+        return ui[get_language()]['error_5']
 
     if direction == 'horizontal':
         for i in range(len(word)):

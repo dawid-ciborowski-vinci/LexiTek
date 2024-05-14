@@ -1,7 +1,10 @@
+from language import get_language
+
+
 # Read words from file
-def read_words(language):
+def read_words():
     words_map = {}
-    with open(f'../data/{language}.dic', 'r') as file:
+    with open(f'../data/{get_language()}/{get_language()}.dic', 'r') as file:
         for line in file:
             word = line.replace('\n', '')
 

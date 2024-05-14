@@ -1,3 +1,15 @@
+# language.py
+LANGUAGE = {'lang': 'english'}  # Default value
+
+
+def set_language(choice):
+    LANGUAGE['lang'] = choice
+
+
+def get_language():
+    return LANGUAGE['lang']
+
+
 ui = {
     'french': {
         'player_number': "Nombre de joueurs:\t",

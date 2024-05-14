@@ -1,11 +1,12 @@
 import random
-
+from language import get_language
 
 letters_map = {}
 
+
 # Read letters with its frequency and value from file
 def read_letters():
-    with open(f'../data/letters_data.let', 'r') as file:
+    with open(f'../data/{get_language()}/{get_language()}.let', 'r') as file:
         for line in file:
             letter, frequency, value = line.split()
 
