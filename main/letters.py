@@ -5,8 +5,8 @@ letters_map = {}
 
 
 # Read letters with its frequency and value from file
-def read_letters(language):
-    with open(f'../data/{language}/{language}.let', 'r') as file:
+def read_letters():
+    with open(f'../data/letters_data.let', 'r') as file:
         for line in file:
             letter, frequency, value = line.split()
 

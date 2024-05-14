@@ -121,7 +121,7 @@ def game():
     players_number = int(players_number)
 
     # Init Letters
-    read_letters(language)
+    read_letters()
     letters = letter_pool()
 
     # Init Dictionary
