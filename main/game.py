@@ -1,5 +1,6 @@
 from words import read_words, is_word_valid
 from letters import read_letters, player_letters, letter_pool, get_value, pop_one
+from prettytable import PrettyTable
 
 languages = ['french', 'english']
 
@@ -45,59 +46,6 @@ MAX_PLAYERS = 4
 LETTERS_PER_PLAYER = 7
 
 dictionary = {}
-
-
-def place_word(board, word, direction, x, y, player_letters, letters):
-    if not (0 <= x < BOARD_SIZE and 0 <= y < BOARD_SIZE):
-        return False
-
-    if not is_word_placeable(board, word, direction, x, y):
-        return False
-
-    if direction == 'horizontal':
-        for i in range(len(word)):
-            letter = word[i]
-            board[y][x + i] = letter
-            player_letters.remove(letter)
-            letter = pop_one(letters)
-            if letter is not None:
-                player_letters.append(letter)
-    elif direction == 'vertical':
-        for i in range(len(word)):
-            letter = word[i]
-            board[y + 1][x] = letter
-            player_letters.remove(letter)
-            letter = pop_one(letters)
-            if letter is not None:
-                player_letters.append(letter)
-
-    return True
-
-
-def is_word_placeable(board, word, direction, x, y):
-    if direction == 'horizontal':
-        if x + len(word) > BOARD_SIZE:
-            return False
-        for i in range(len(word)):
-            if board[x + 1][y] != '':
-                return False
-    elif direction == 'vertical':
-        if y + len(word) > BOARD_SIZE:
-            return False
-        for i in range(len(word)):
-            if board[x][y + i] != '':
-                return False
-    return True
-
-
-def is_centered(word, direction, x, y):
-    if direction == 'horizontal':
-        if (x <= 7 < x + len(word)) and (y == 7):
-            return True
-    elif direction == 'vertical':
-        if (y <= 7 < y + len(word)) and (x == 7):
-            return True
-    return False
 
 
 # Function to run the LexiTek game
@@ -191,10 +139,10 @@ def game():
                 if not y.isnumeric():
                     print("La ligne doit être un nombre.")
                 else:
-                    x = int(x)
-                    y = int(y)
+                    x = int(x) - 1
+                    y = int(y) - 1
                     if turn == 0 and not is_centered(word, direction, x, y):
-                        print("Le mot doit passer par la case centrale (7, 7) lors du premier tour.")
+                        print("Le mot doit passer par la case centrale (8, 8) lors du premier tour.")
                     else:
                         break
 
@@ -215,6 +163,79 @@ def game():
         turn += 1
 
 
+def place_word(board, word, direction, x, y, player_letters, letters):
+    if not (0 <= x < BOARD_SIZE and 0 <= y < BOARD_SIZE):
+        return "Erreur : Les coordonnées du mot sont en dehors des limites du plateau."
+
+    if direction == 'horizontal' and x + len(word) > BOARD_SIZE:
+        return "Erreur : Le mot dépasse les limites du plateau en direction horizontale."
+    elif direction == 'vertical' and y + len(word) > BOARD_SIZE:
+        return "Erreur : Le mot dépasse les limites du plateau en direction verticale."
+
+    if not is_word_placeable(board, word, direction, x, y):
+        return "Erreur : Le mot ne peut pas être placé à cet endroit."
+
+    if not is_word_compatible(board, word, direction, x, y):
+        return "Erreur : Le mot et sa position ne sont pas compatibles avec les lettres sur le plateau."
+
+    if direction == 'horizontal':
+        for i in range(len(word)):
+            letter = word[i]
+            board[y][x + i] = letter
+            player_letters.remove(letter)
+            letter = pop_one(letters)
+            if letter is not None:
+                player_letters.append(letter)
+    elif direction == 'vertical':
+        for i in range(len(word)):
+            letter = word[i]
+            board[y + i][x] = letter
+            player_letters.remove(letter)
+            letter = pop_one(letters)
+            if letter is not None:
+                player_letters.append(letter)
+
+    return True
+
+
+def is_word_placeable(board, word, direction, x, y):
+    if direction == 'horizontal':
+        if x + len(word) > BOARD_SIZE:
+            return False
+        for i in range(len(word)):
+            if board[x + 1][y] != '':
+                return False
+    elif direction == 'vertical':
+        if y + len(word) > BOARD_SIZE:
+            return False
+        for i in range(len(word)):
+            if board[x][y + i] != '':
+                return False
+    return True
+
+
+def is_word_compatible(board, word, direction, x, y):
+    if direction == 'horizontal':
+        for i in range(len(word)):
+            if board[y][x + i] != '' and board[y][x + i] != word[i]:
+                return False
+    elif direction == 'vertical':
+        for i in range(len(word)):
+            if board[y + i][x] != '' and board[y + i][x] != word[i]:
+                return False
+    return True
+
+
+def is_centered(word, direction, x, y):
+    if direction == 'horizontal':
+        if (x <= 7 < x + len(word)) and (y == 7):
+            return True
+    elif direction == 'vertical':
+        if (y <= 7 < y + len(word)) and (x == 7):
+            return True
+    return False
+
+
 def display_player_pool(pool):
     for letter in pool:
         print(f"{letter.capitalize()}", end="\t")
@@ -225,12 +246,21 @@ def display_player_pool(pool):
 
 
 def display_board(board):
-    print('\t', end='')
-    for i in range(len(board[0])):
-        print(f'{i}\t', end='')
-    print()
+    table = PrettyTable()
+
+    # Add column headers
+    table.field_names = [" "] + [str(i+1) for i in range(BOARD_SIZE)]
+
+    # Add rows with delimiters
     for i, row in enumerate(board):
-        print(f'{i}\t', end='')
-        for cell in row:
-            print(cell if cell else '.', end='\t')
-        print()
+        row_content = []
+        for j, cell in enumerate(row):
+            if i == j == BOARD_SIZE // 2:  # Check if the cell is the center cell
+                row_content.append(cell if cell else "*")
+            else:
+                row_content.append(cell if cell else " ")
+        table.add_row([str(i+1)] + row_content)
+        if i != BOARD_SIZE - 1:  # Don't add a delimiter after the last row
+            table.add_row(["-"] * (BOARD_SIZE + 1))  # Add a delimiter row
+
+    print(table)
