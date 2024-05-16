@@ -1,4 +1,5 @@
 from language import get_language
+from letters import get_value
 
 
 # Read words from file
@@ -13,14 +14,23 @@ def read_words():
     return words_map
 
 
-def is_word_valid(word, player_letters, dictionary):
+def is_word_valid(word, player_letters, dictionary, board, x, y, direction):
     # Check if the word is in the dictionary
     player_word = word.upper()
     if player_word not in dictionary:
-        return False
+        return 0
 
-    # Check if the word can be formed with the player's letters
-    for letter in player_word:
+    score = 0
+
+    # Check if the word can be formed with the player's letters and/or letters on the board
+    for i, letter in enumerate(player_word):
         if letter not in player_letters:
-            return False
-    return True
+            if direction == 'horizontal':
+                if board[y][x + i] != letter:
+                    return 0
+            elif direction == 'vertical':
+                if board[y + i][x] != letter:
+                    return 0
+        score += get_value(letter)
+
+    return score

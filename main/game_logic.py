@@ -25,19 +25,23 @@ def place_word(board, word, direction, x, y, player_letters, letters):
     if direction == 'horizontal':
         for i in range(len(word)):
             letter = word[i]
+            if board[y][x + i] == '':  # Only remove the letter from the player's pool if it's not already on the board
+                player_letters.remove(letter)
+                letter_to_add = pop_one(letters)
+                print(letter_to_add)
+                if letter_to_add is not None:
+                    player_letters.append(letter_to_add)
             board[y][x + i] = letter
-            player_letters.remove(letter)
-            letter = pop_one(letters)
-            if letter is not None:
-                player_letters.append(letter)
     elif direction == 'vertical':
         for i in range(len(word)):
             letter = word[i]
+            if board[y + i][x] == '':  # Only remove the letter from the player's pool if it's not already on the board
+                player_letters.remove(letter)
+                letter_to_add = pop_one(letters)
+                print(letter_to_add)
+                if letter_to_add is not None:
+                    player_letters.append(letter_to_add)
             board[y + i][x] = letter
-            player_letters.remove(letter)
-            letter = pop_one(letters)
-            if letter is not None:
-                player_letters.append(letter)
 
     return True
 
@@ -47,13 +51,13 @@ def is_word_placeable(board, word, direction, x, y):
         if x + len(word) > BOARD_SIZE:
             return False
         for i in range(len(word)):
-            if board[x + 1][y] != '':
+            if board[y][x + i] != '' and board[y][x + i] != word[i]:
                 return False
     elif direction == 'vertical':
         if y + len(word) > BOARD_SIZE:
             return False
         for i in range(len(word)):
-            if board[x][y + i] != '':
+            if board[y + i][x] != '' and board[y + i][x] != word[i]:
                 return False
     return True
 

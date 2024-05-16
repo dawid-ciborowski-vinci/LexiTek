@@ -45,14 +45,15 @@ def game():
     players = {}
     for i in range(players_number):
         my_letters = player_letters(letters, LETTERS_PER_PLAYER)
-        players[i] = my_letters
+        player = {'letters': my_letters, 'score': 0}
+        players[i] = player
     turn = 0
 
     # Game loop
     running = True
     while running:
         player_number = turn % len(players)
-        player_letters_pool = players[player_number]
+        player_letters_pool = players[player_number]['letters']
 
         print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
         print(f"\t\t\t\t\t {ui[get_language()]['turn']}{player_number + 1}\n")
@@ -80,9 +81,7 @@ def game():
 
         # PLAYER PLACES A WORD
         if choice1 == 'a':
-            while not is_word_valid(word, player_letters_pool, dictionary):
-                word = input(ui[get_language()]['enter_word']).upper()
-
+            score = 0
             while direction not in ['a', 'b']:
                 print(ui[get_language()]['enter_direction']['q'])
                 print(ui[get_language()]['enter_direction']['a'])
@@ -94,23 +93,47 @@ def game():
             elif direction == 'b':
                 direction = 'vertical'
 
-            while True:
-                x = input(ui[get_language()]['enter_x'])
-                y = input(ui[get_language()]['enter_y'])
-                if not x.isnumeric():
-                    print(f"{ui[get_language()]['column_must_number']}")
-                if not y.isnumeric():
-                    print(f"{ui[get_language()]['line_must_number']}")
-                else:
-                    x = int(x) - 1
-                    y = int(y) - 1
-                    if turn == 0 and not is_centered(word, direction, x, y):
-                        print(f"{ui[get_language()]['centered']}")
+            if turn == 0:  # If it's the first turn
+                while score == 0:
+                    word = input(ui[get_language()]['enter_word']).upper()
+                    score = is_word_valid(word, player_letters_pool, dictionary, board, 8, 8, direction)
+
+                while True:
+                    x = input(ui[get_language()]['enter_x'])
+                    y = input(ui[get_language()]['enter_y'])
+                    if not x.isnumeric():
+                        print(f"{ui[get_language()]['column_must_number']}")
+                    if not y.isnumeric():
+                        print(f"{ui[get_language()]['line_must_number']}")
                     else:
+                        x = int(x) - 1
+                        y = int(y) - 1
+                        if not is_centered(word, direction, x, y):
+                            print(f"{ui[get_language()]['centered']}")
+                        else:
+                            break
+            else:  # If it's not the first turn
+                while True:
+                    x = input(ui[get_language()]['enter_x'])
+                    y = input(ui[get_language()]['enter_y'])
+                    if not x.isnumeric():
+                        print(f"{ui[get_language()]['column_must_number']}")
+                    if not y.isnumeric():
+                        print(f"{ui[get_language()]['line_must_number']}")
+                    else:
+                        x = int(x) - 1
+                        y = int(y) - 1
                         break
 
+                while score == 0:
+                    word = input(ui[get_language()]['enter_word']).upper()
+                    score = is_word_valid(word, player_letters_pool, dictionary, board, x, y, direction)
+
             res = place_word(board, word, direction, x, y, player_letters_pool, letters)
+            if res is True:
+                players[player_number]['score'] += score
             print(res)
+            print(f"Score: {players[player_number]['score']}")
 
         # PLAYER CHANGES A LETTER
         elif choice1 == 'b':
