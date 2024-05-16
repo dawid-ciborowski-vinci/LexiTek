@@ -26,10 +26,10 @@ def is_word_valid(word, player_letters, dictionary, board, x, y, direction):
     for i, letter in enumerate(player_word):
         if letter not in player_letters:
             if direction == 'horizontal':
-                if board[y][x + i] != letter:
+                if board[y][x + i] != letter and board[y][x + i] != '':
                     return 0
             elif direction == 'vertical':
-                if board[y + i][x] != letter:
+                if board[y + i][x] != letter and board[y + i][x] != '':
                     return 0
         score += get_value(letter)
 
