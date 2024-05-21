@@ -4,7 +4,7 @@ from language import get_language
 letters_map = {}
 
 
-# Read letters with its frequency and value from file
+# Lire les lettres
 def read_letters():
     with open(f'../data/{get_language()}/{get_language()}.let', 'r') as file:
         for line in file:
@@ -20,7 +20,7 @@ def read_letters():
 read_letters()
 
 
-# Make the letter pool
+# Créer un pool de lettres
 def letter_pool():
     pool = []
     for letter in letters_map.keys():
@@ -29,10 +29,12 @@ def letter_pool():
     return pool
 
 
+# Obtenir la valeur d'une lettre
 def get_value(letter):
     return letters_map[letter]['v']
 
 
+# Afficher le pool de lettres d'un joueur
 def player_letters(available_letters, number_of_letters):
     letters = []
     for _ in range(number_of_letters):
@@ -42,6 +44,7 @@ def player_letters(available_letters, number_of_letters):
     return letters
 
 
+# Obtenir une lettre aléatoire
 def pop_one(available_letters):
     letter = None
     if len(available_letters) != 0:

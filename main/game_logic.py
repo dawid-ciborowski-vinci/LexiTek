@@ -1,11 +1,10 @@
 from prettytable import PrettyTable
-
-from language import ui, get_language
 from letters import get_value, pop_one
 
 BOARD_SIZE = 15
 
 
+# Lire les mots du fichier
 def place_word(board, word, direction, x, y, player_letters, letters):
     if direction == 'horizontal':
         for i in range(len(word)):
@@ -31,6 +30,7 @@ def place_word(board, word, direction, x, y, player_letters, letters):
     return True
 
 
+# Vérifier si le mot est valide
 def is_word_placeable(board, word, direction, x, y):
     if direction == 'horizontal':
         if x + len(word) > BOARD_SIZE:
@@ -47,6 +47,7 @@ def is_word_placeable(board, word, direction, x, y):
     return True
 
 
+# Vérifier si le mot est compatible
 def is_word_compatible(board, word, direction, x, y):
     if direction == 'horizontal':
         for i in range(len(word)):
@@ -59,6 +60,7 @@ def is_word_compatible(board, word, direction, x, y):
     return True
 
 
+# Vérifier si le mot est centré
 def is_centered(word, direction, x, y):
     if direction == 'horizontal':
         if (x <= 7 < x + len(word)) and (y == 7):
@@ -69,6 +71,7 @@ def is_centered(word, direction, x, y):
     return False
 
 
+# Vérifier si le mot est adjacent ou fait partie d'un mot
 def is_adjacent_or_part(board, word, direction, x, y):
     dx, dy = (1, 0) if direction == 'horizontal' else (0, 1)
     touches_or_crosses = False
@@ -91,6 +94,7 @@ def is_adjacent_or_part(board, word, direction, x, y):
     return touches_or_crosses
 
 
+# Afficher le pool de lettres du joueur
 def display_player_pool(pool):
     table = PrettyTable(header=False)
     letters = [letter.upper() for letter in pool]
@@ -110,6 +114,7 @@ def display_player_pool(pool):
     print()"""
 
 
+# Afficher le plateau
 def display_board(board):
     table = PrettyTable()
 

@@ -2,10 +2,12 @@
 LANGUAGE = {'lang': 'english'}  # Default value
 
 
+# Fonction pour définir la langue
 def set_language(choice):
     LANGUAGE['lang'] = choice
 
 
+# Fonction pour obtenir la langue
 def get_language():
     return LANGUAGE['lang']
 

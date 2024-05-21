@@ -13,9 +13,14 @@ LETTERS_PER_PLAYER = 7
 dictionary = {}
 
 
-# Function to run the LexiTek game
+# Fonction pour exécuter le jeu LexiTek
+# Cette fonction initialise les paramètres du jeu, y compris la sélection de la langue,
+# le nombre de joueurs et configure le plateau et les réservoirs de lettres des joueurs.
+# Ensuite, elle gère la boucle principale du jeu, permettant aux joueurs de placer des mots,
+# d'échanger des lettres ou de passer leur tour. Le jeu se termine lorsque certaines conditions
+# sont remplies, et les scores finaux sont affichés.
 def game():
-    # Language
+    # Sélection de la langue
     print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
     print("\t\t\t\t\t\t\t\t\tLexiTek")
     print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
@@ -27,22 +32,22 @@ def game():
         language_choice = input("\nChoose your language:\t")
     set_language(languages[int(language_choice) - 1])
 
-    # Players number
+    # Nombre de joueurs
     players_number = '0'
     while players_number == '0' or not players_number.isnumeric() or int(players_number) > MAX_PLAYERS:
         players_number = input(f"{ui[get_language()]['player_number']} (max = {MAX_PLAYERS}):\t")
     players_number = int(players_number)
 
-    # Init Letters
+    # Initialisation des lettres
     letters = letter_pool()
 
-    # Init Dictionary
+    # Initialisation du dictionnaire
     dictionary = read_words()
 
-    # Init Board
+    # Initialisation du plateau
     board = [['' for _ in range(BOARD_SIZE)] for _ in range(BOARD_SIZE)]
 
-    # Init Players and turn
+    # Initialisation des joueurs et du tour
     players = {}
     for i in range(players_number):
         name = input(f"{ui[get_language()]['player_name']}{i + 1} :\t")
@@ -51,13 +56,13 @@ def game():
         players[i] = player
     turn = 0
 
-    # Init Number of Passes
+    # Initialisation du nombre de passes
     passes = 0
 
-    # Init Boolean for Centered Word
+    # Initialisation de la variable pour vérifier si un mot centré existe
     exists_centered_word = False
 
-    # Game Loop
+    # Boucle principale du jeu
     running = True
     while running:
         player_number = turn % len(players)
@@ -172,7 +177,7 @@ def game():
                     else:
                         print(res)
 
-            # PLAYER CHANGES A LETTER
+            # LE JOUEUR CHANGE DE LETTRE(S)
             elif choice1 == 'b':
                 letter_choice = ''
                 while True:
@@ -191,7 +196,7 @@ def game():
                         player_letters_pool.append(letter_to_add)
                     action_done = True
 
-            # PLAYER PASSES
+            # LE JOUEUR PASSE SON TOUR
             elif choice1 == 'c':
                 players[player_number]['pass'] = True
                 passes += 1
@@ -205,7 +210,7 @@ def game():
             print(ui[get_language()]['no_letters_left'])
             running = False
 
-    # Game Over
+    # Affichage des scores finaux
     print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
     print(f"\t\t\t\t\t\t\t\t{ui[get_language()]['game_over']}")
     display_board(board)
