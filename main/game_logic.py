@@ -12,7 +12,6 @@ def place_word(board, word, direction, x, y, player_letters, letters):
             if board[y][x + i] == '':  # Only remove the letter from the player's pool if it's not already on the board
                 player_letters.remove(letter)
                 letter_to_add = pop_one(letters)
-                print(letter_to_add)
                 if letter_to_add is not None:
                     player_letters.append(letter_to_add)
             board[y][x + i] = letter
@@ -22,7 +21,6 @@ def place_word(board, word, direction, x, y, player_letters, letters):
             if board[y + i][x] == '':  # Only remove the letter from the player's pool if it's not already on the board
                 player_letters.remove(letter)
                 letter_to_add = pop_one(letters)
-                print(letter_to_add)
                 if letter_to_add is not None:
                     player_letters.append(letter_to_add)
             board[y + i][x] = letter
