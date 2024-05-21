@@ -12,7 +12,8 @@ def get_language():
 
 ui = {
     'french': {
-        'player_number': "Nombre de joueurs:\t",
+        'player_number': "Nombre de joueurs",
+        'player_name': "Nom du joueur n°",
         'turn': 'Tour du joueur n°',
         'your_letters': 'Voici vos lettres :',
         'choice': "\nMon choix:\t",
@@ -37,10 +38,14 @@ ui = {
         'error_3': 'Le mot dépasse les limites du plateau en direction verticale.',
         'error_4': 'Le mot ne peut pas être placé à cet endroit.',
         'error_5': 'Le mot et sa position ne sont pas compatibles avec les lettres sur le plateau.',
+        'game_over': 'Fin de la partie',
+        'scores': 'Scores :',
+        'winner': 'Le gagnant avec le score de',
     },
     'english': {
-        'player_number': "Number of players:\t",
-        'turn': 'Player turn n°',
+        'player_number': "Number of players",
+        'player_name': 'Name of player n°',
+        'turn': 'Turn of player n°',
         'your_letters': 'Here are your letters :',
         'choice': "\nMy choice:\t",
         'choose_action': {'q': 'What is your action ?',
@@ -64,9 +69,13 @@ ui = {
         'error_3': 'The word exceeds the board limits vertically.',
         'error_4': 'The word cannot be placed at this location.',
         'error_5': 'The word and its position are not compatible with the letters on the board.',
+        'game_over': 'Game Over',
+        'scores': 'Scores :',
+        'winner': 'The winner with the score of',
     },
     'italian': {
-        'player_number': "Numero di giocatori:\t",
+        'player_number': "Numero di giocatori",
+        'player_name': 'Nome del giocatore n°',
         'turn': 'Turno del giocatore n°',
         'your_letters': 'Ecco le tue lettere :',
         'choice': "\nLa mia scelta:\t",
@@ -91,5 +100,8 @@ ui = {
         'error_3': 'La parola supera i limiti della scacchiera in verticale.',
         'error_4': 'La parola non può essere posizionata in questa posizione.',
         'error_5': 'La parola e la sua posizione non sono compatibili con le lettere sulla scacchiera.',
+        'game_over': 'Fine del gioco',
+        'scores': 'Punteggi :',
+        'winner': 'Il vincitore con il punteggio di',
     }
 }

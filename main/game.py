@@ -29,7 +29,7 @@ def game():
     # Players number
     players_number = '0'
     while players_number == '0' or not players_number.isnumeric() or int(players_number) > MAX_PLAYERS:
-        players_number = input(ui[get_language()]['player_number'])
+        players_number = input(f"{ui[get_language()]['player_number']} (max = {MAX_PLAYERS}):\t")
     players_number = int(players_number)
 
     # Init Letters
@@ -44,19 +44,26 @@ def game():
     # Init Players and turn
     players = {}
     for i in range(players_number):
+        name = input(f"{ui[get_language()]['player_name']}{i + 1} :\t")
         my_letters = player_letters(letters, LETTERS_PER_PLAYER)
-        player = {'letters': my_letters, 'score': 0}
+        player = {'name': name, 'letters': my_letters, 'score': 0, 'pass': False}
         players[i] = player
     turn = 0
 
-    # Game loop
+    # Init Number of Passes
+    passes = 0
+
+    # Game Loop
     running = True
     while running:
         player_number = turn % len(players)
+        if players[player_number]['pass']:
+            turn += 1
+            continue
         player_letters_pool = players[player_number]['letters']
 
         print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
-        print(f"\t\t\t\t\t {ui[get_language()]['turn']}{player_number + 1}\n")
+        print(f"\t\t\t\t\t {ui[get_language()]['turn']}{player_number + 1} : {players[player_number]['name']}\n")
         display_board(board)
 
         print(f"\n{ui[get_language()]['your_letters']} \n")
@@ -71,10 +78,11 @@ def game():
         direction = ""
         changed_all_letters = False
 
-        while choice1 not in ['a', 'b']:
+        while choice1 not in ['a', 'b', 'c']:
             print(ui[get_language()]['choose_action']['q'])
             print(ui[get_language()]['choose_action']['a'])
             print(ui[get_language()]['choose_action']['b'])
+            print(ui[get_language()]['choose_action']['c'])
             if changed_all_letters:
                 print(ui[get_language()]['choose_action']['c'])
             choice1 = input(ui[get_language()]['choice'])
@@ -146,4 +154,26 @@ def game():
                 letters.append(removed_letter)
                 player_letters_pool.append(letter_to_add)
 
+        # PLAYER PASSES
+        elif choice1 == 'c':
+            players[player_number]['pass'] = True
+            passes += 1
+            if passes == players_number:
+                running = False
         turn += 1
+
+    # Game Over
+    print("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
+    print(ui[get_language()]['game_over'])
+    print(ui[get_language()]['scores'])
+
+    max_score = -1
+    winner = -1
+
+    for i in range(players_number):
+        print(f"► {players[i]['name']}\t:\t{players[i]['score']}")
+        if players[i]['score'] > max_score:
+            max_score = players[i]['score']
+            winner = i
+
+    print(f"\n{ui[get_language()]['winner']} {max_score} : {players[winner]['name']} !")
