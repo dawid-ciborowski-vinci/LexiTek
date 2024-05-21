@@ -106,12 +106,22 @@ def is_adjacent_or_part(board, word, direction, x, y):
 
 
 def display_player_pool(pool):
-    for letter in pool:
+    table = PrettyTable(header=False)
+    letters = [letter.upper() for letter in pool]
+    values = [get_value(letter) for letter in pool]
+    table.add_row(letters)
+    table.add_row(values)
+
+    table.padding_width = 2
+
+    print(table)
+
+    """for letter in pool:
         print(f"{letter.capitalize()}", end="\t")
     print()
     for letter in pool:
         print(f"{get_value(letter)}", end="\t")
-    print()
+    print()"""
 
 
 def display_board(board):
