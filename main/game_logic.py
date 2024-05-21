@@ -3,7 +3,6 @@ from prettytable import PrettyTable
 from language import ui, get_language
 from letters import get_value, pop_one
 
-
 BOARD_SIZE = 15
 
 
@@ -84,6 +83,21 @@ def is_centered(word, direction, x, y):
     return False
 
 
+def is_adjacent_or_part(board, word, direction, x, y):
+    dx, dy = (0, 1) if direction == 'horizontal' else (1, 0)
+    for i in range(len(word)):
+        # Check the cell itself
+        if board[x + dx * i][y + dy * i] != '':
+            return True
+        # Check the surrounding cells
+        for j in range(-1, 2):
+            for k in range(-1, 2):
+                if 0 <= x + dx * i + j < BOARD_SIZE and 0 <= y + dy * i + k < BOARD_SIZE:
+                    if board[x + dx * i + j][y + dy * i + k] != '':
+                        return True
+    return False
+
+
 def display_player_pool(pool):
     for letter in pool:
         print(f"{letter.capitalize()}", end="\t")
@@ -97,7 +111,7 @@ def display_board(board):
     table = PrettyTable()
 
     # Add column headers
-    table.field_names = [" "] + [f"{i+1:<2}" for i in range(BOARD_SIZE)]
+    table.field_names = [" "] + [f"{i + 1:<2}" for i in range(BOARD_SIZE)]
 
     # Add rows with delimiters
     for i, row in enumerate(board):
@@ -107,7 +121,7 @@ def display_board(board):
                 row_content.append(f"{cell if cell else '*':<2}")
             else:
                 row_content.append(f"{cell if cell else ' ':<2}")
-        table.add_row([f"{i+1:<2}"] + row_content)
+        table.add_row([f"{i + 1:<2}"] + row_content)
         if i != BOARD_SIZE - 1:  # Don't add a delimiter after the last row
             table.add_row(["-"] * (BOARD_SIZE + 1))  # Add a delimiter row
 
