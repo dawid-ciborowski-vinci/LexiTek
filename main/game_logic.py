@@ -84,18 +84,25 @@ def is_centered(word, direction, x, y):
 
 
 def is_adjacent_or_part(board, word, direction, x, y):
-    dx, dy = (0, 1) if direction == 'horizontal' else (1, 0)
+    dx, dy = (1, 0) if direction == 'horizontal' else (0, 1)
+    touches_or_crosses = False
     for i in range(len(word)):
         # Check the cell itself
-        if board[x + dx * i][y + dy * i] != '':
-            return True
+        if board[y + dy * i][x + dx * i] != '':
+            touches_or_crosses = True
         # Check the surrounding cells
-        for j in range(-1, 2):
-            for k in range(-1, 2):
-                if 0 <= x + dx * i + j < BOARD_SIZE and 0 <= y + dy * i + k < BOARD_SIZE:
-                    if board[x + dx * i + j][y + dy * i + k] != '':
-                        return True
-    return False
+        else:
+            for j in range(-1, 2):
+                for k in range(-1, 2):
+                    if 0 <= y + dy * i + j < BOARD_SIZE and 0 <= x + dx * i + k < BOARD_SIZE:
+                        if board[y + dy * i + j][x + dx * i + k] != '':
+                            touches_or_crosses = True
+                            break
+                if touches_or_crosses:
+                    break
+        if touches_or_crosses:
+            break
+    return touches_or_crosses
 
 
 def display_player_pool(pool):

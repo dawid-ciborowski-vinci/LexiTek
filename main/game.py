@@ -142,7 +142,7 @@ def game():
                 if turn != 0 and not is_adjacent_or_part(board, word, direction, x, y):
                     print(ui[get_language()]['error_6'])
                     continue
-                letters = ['A', 'B']
+
                 res = place_word(board, word, direction, x, y, player_letters_pool, letters)
                 if res is True:
                     players[player_number]['score'] += score
