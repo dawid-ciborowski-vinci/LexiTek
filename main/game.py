@@ -1,7 +1,8 @@
 from words import read_words, is_word_valid
 from letters import player_letters, letter_pool, pop_one
 from language import ui, set_language, get_language
-from game_logic import place_word, display_board, display_player_pool, is_centered, is_adjacent_or_part
+from game_logic import place_word, display_board, display_player_pool, is_centered, is_adjacent_or_part, \
+    is_word_placeable, is_word_compatible
 
 languages = ['french', 'english', 'italian']
 
@@ -124,6 +125,10 @@ def game():
                     if x == '0' or y == '0':
                         break
 
+                    if not (0 <= x < BOARD_SIZE and 0 <= y < BOARD_SIZE):
+                        print(ui[get_language()]['error_1'])
+                        continue
+
                     while score == 0:
                         word = input(ui[get_language()]['enter_word'])
                         if word == '0':
@@ -134,6 +139,20 @@ def game():
 
                     if word == '0':
                         break
+
+                    if direction == 'horizontal' and x + len(word) > BOARD_SIZE:
+                        print(ui[get_language()]['error_2'])
+                    elif direction == 'vertical' and y + len(word) > BOARD_SIZE:
+                        print(ui[get_language()]['error_3'])
+                        continue
+
+                    if not is_word_placeable(board, word, direction, x, y):
+                        print(ui[get_language()]['error_4'])
+                        continue
+
+                    if not is_word_compatible(board, word, direction, x, y):
+                        print(ui[get_language()]['error_5'])
+                        continue
 
                     if not exists_centered_word and not is_centered(word, direction, x, y):
                         print(f"{ui[get_language()]['centered']}")
@@ -196,7 +215,7 @@ def game():
     winner = -1
 
     for i in range(players_number):
-        print(f"► {players[i]['name']}\t:\t{players[i]['score']}")
+        print(f"► {players[i]['name']}\t:\t{players[i]['score']} {ui[get_language()]['points']}")
         if players[i]['score'] > max_score:
             max_score = players[i]['score']
             winner = i
